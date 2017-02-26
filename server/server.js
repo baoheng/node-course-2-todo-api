@@ -1,3 +1,5 @@
+const _ = require('loadash');
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
@@ -16,7 +18,6 @@ app.post('/todos', (req, res) =>{
     var todo = new Todo({
         text: req.body.text
     })
-    console.log(JSON.stringify(todo));
     todo.save().then((doc) =>{
         res.send(doc);
     }, (e) =>{
@@ -36,17 +37,63 @@ app.get('/todos/:id', (req, res) => {
    var id = req.params.id;
 
    if (!ObjectID.isValid(id)){
-       return res.status(400).send({});
+       return res.status(404).send({});
    }
 
    Todo.findById(id).then((todos) => {
        if (!todos) {
-           return res.status(400).send({});
+           return res.status(404).send({});
        }
        res.send({todos});
    }).catch((e) => {
        res.status(400).send({});
    })
+});
+
+app.delete('/todos/:id', (req, res) => {
+   var id = req.params.id;
+
+    if (!ObjectID.isValid(id)){
+        return res.status(404).send({});
+    }
+
+    Todo.findByIdAndRemove(id).then((todos) => {
+        if (!todos) {
+            return res.status(404).send();
+        }
+
+        res.send({todos});
+    }).catch((e) => {
+        res.status(400).send();
+    })
+});
+
+app.patch('/todos/:id', (req, res) => {
+   var id = req.params.id;
+
+   // _.pick() picks attributes out of something
+   var body = _.pick(req.body, ['text', 'completed']);
+
+    if (!ObjectID.isValid(id)){
+        return res.status(404).send({});
+    }
+
+    if (_.isBoolean(body.completed) && body.completed) {
+        body.completedAt = new Date().getTime();
+    } else {
+        body.completed = false;
+        body.completedAt = null;
+    }
+
+    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+        if (!todos) {
+            return res.status(404).send();
+        }
+
+        res.send({todos});
+    }, (e) => {
+        res.status(400).send();
+    });
 });
 
 app.listen(port, () => {
