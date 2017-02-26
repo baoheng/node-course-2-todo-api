@@ -1,4 +1,4 @@
-const _ = require('loadash');
+const _ = require('lodash');
 
 var express = require('express');
 var bodyParser = require('body-parser');
