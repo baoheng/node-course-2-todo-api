@@ -1,7 +1,7 @@
 // const MongoClient = require('mongodb').MongoClient;
 const {MongoClient, ObjectID} = require('mongodb');
 
-var obj = new ObjectID();
+// var obj = new ObjectID();
 // ES6 destructing
 // var user = {name: 'Alden', age: 25};
 // var {name} = user;
@@ -15,17 +15,18 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
 
     console.log('Connected to MongoDB server');
 
-    // deleteMany
-    // db.collection('Todos').deleteMany({text: 'eat lunch'}).then((result) => {
-    //     console.log(result);
-    // });
-    // deleteOne
-    // db.collection('Todos').deleteOne({text: 'eat lunch'}).then((result) => {
-    //    console.log(result);
-    // });
-    // findOneAndDelete
-    db.collection('Todos').findOneAndDelete({text: 'eat lunch'}).then((result) => {
-       console.log(result);
+    // findOneAndUpdate
+    db.collection('Todos').findOneAndUpdate({
+        _id: new ObjectID("589f70b0fd70010499ebcd1c")
+    }, {
+        $set: {
+            completed: false
+        },
+    }, {
+        returnOrigin: false
+    }).then((result) => {
+        console.log(result);
     });
+
     // db.close();
 });
